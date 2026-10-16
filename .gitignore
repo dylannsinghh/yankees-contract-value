@@ -5,3 +5,7 @@ data/
 target/
 logs/
 .user.yml
+
+exports/*.csv
+*.twbx
+*.twb

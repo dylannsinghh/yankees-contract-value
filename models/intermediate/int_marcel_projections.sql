@@ -140,6 +140,7 @@ select
     round(age_factor, 3)                            as age_factor,
     round(projected_pt, 1)                          as projected_pt,
     round(weighted_availability, 3)                 as weighted_availability,
+    round(least(projected_pt / full_season_pt, 1), 3) as marcel_availability,
     round(projected_war_per_pt * full_season_pt, 2) as projected_war_per_full_season,
     round(projected_war_per_pt * projected_pt, 2)   as projected_war
 from projected

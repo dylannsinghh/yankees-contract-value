@@ -46,3 +46,10 @@ models:
       - name: healthy_war
         data_tests:
           - not_null
+
+  - name: int_roster_control_seasons
+    columns:
+      - name: control_season_key
+        data_tests:
+          - unique
+          - not_null

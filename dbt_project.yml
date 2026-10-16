@@ -12,6 +12,7 @@ vars:
   marcel_regression_pa: 1200
   marcel_regression_ip: 180
   war_decline_per_year: 0.5
+  arb_share_of_value: 0.6
 
 models:
   yankees_contract_value:
