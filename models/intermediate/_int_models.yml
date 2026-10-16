@@ -20,3 +20,29 @@ models:
       - name: nyy_share
         data_tests:
           - not_null
+
+  - name: int_marcel_projections
+    columns:
+      - name: projection_key
+        data_tests:
+          - unique
+          - not_null
+      - name: projected_war
+        data_tests:
+          - not_null
+      - name: reliability
+        data_tests:
+          - not_null
+
+  - name: int_remaining_contract_seasons
+    columns:
+      - name: remaining_season_key
+        data_tests:
+          - unique
+          - not_null
+      - name: expected_war
+        data_tests:
+          - not_null
+      - name: healthy_war
+        data_tests:
+          - not_null

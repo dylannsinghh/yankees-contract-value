@@ -6,6 +6,7 @@ with batting as (
         player_id,
         season,
         max(player_name)                    as player_name,
+        max(age)                            as age,
         sum(plate_appearances)              as plate_appearances,
         sum(games)                          as games_batting,
         sum(war)                            as war_batting,
@@ -19,6 +20,7 @@ pitching as (
         player_id,
         season,
         max(player_name)                    as player_name,
+        max(age)                            as age,
         sum(games)                          as games_pitching,
         sum(games_started)                  as games_started,
         sum(outs_recorded) / 3.0            as innings_pitched,
@@ -33,6 +35,7 @@ combined as (
         coalesce(b.player_id, p.player_id)     as player_id,
         coalesce(b.season, p.season)           as season,
         coalesce(b.player_name, p.player_name) as player_name,
+        coalesce(b.age, p.age)                 as age,
         coalesce(b.teams_batting, p.teams_pitching) as teams,
         b.plate_appearances,
         b.games_batting,
@@ -52,6 +55,7 @@ select
     player_id,
     season,
     player_name,
+    age,
     teams,
     case
         when coalesce(games_pitching, 0) >= coalesce(games_batting, 0) then 'pitcher'
