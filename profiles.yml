@@ -1,0 +1,7 @@
+yankees_contract_value:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: data/yankees.duckdb
+      threads: 4

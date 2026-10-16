@@ -1,0 +1,79 @@
+models:
+  - name: stg_war_batting
+    columns:
+      - name: player_stint_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_id
+        data_tests:
+          - not_null
+      - name: season
+        data_tests:
+          - not_null
+      - name: is_pitcher
+        data_tests:
+          - not_null
+
+  - name: stg_war_pitching
+    columns:
+      - name: player_stint_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_id
+        data_tests:
+          - not_null
+      - name: season
+        data_tests:
+          - not_null
+
+  - name: stg_nyy_contracts
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: player_name
+        data_tests:
+          - not_null
+
+  - name: stg_nyy_salaries
+    columns:
+      - name: player_season_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_nyy_contracts')
+                field: player_id
+      - name: salary_type
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['guaranteed', 'arb_estimate', 'arb_unknown', 'free_agent', 'pre_arb', 'not_under_control']
+      - name: salary_usd
+        data_tests:
+          - not_null:
+              config:
+                where: "salary_type in ('guaranteed', 'arb_estimate', 'pre_arb')"
+
+  - name: stg_nyy_dead_money
+    columns:
+      - name: dead_money_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_name
+        data_tests:
+          - not_null
+      - name: adjustment_type
+        data_tests:
+          - not_null
+      - name: amount_usd
+        data_tests:
+          - not_null

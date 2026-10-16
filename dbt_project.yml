@@ -1,0 +1,18 @@
+name: yankees_contract_value
+version: "1.0.0"
+profile: yankees_contract_value
+
+model-paths: ["models"]
+
+vars:
+  dollars_per_war_low: 8000000
+  dollars_per_war_base: 9500000
+  dollars_per_war_high: 11000000
+  pre_arb_salary: 780000
+
+models:
+  yankees_contract_value:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
