@@ -29,8 +29,7 @@
 - Parsed salaries plus dead money reconcile to B-Ref's Dollars Committed total for 2026-2032, after the documented items in seeds/payroll_reconciling_items.csv.
 
 ## Assumptions
-- Pre-arb players with no listed salary: $780,000 (2026 league minimum)
-- Service time format: years.days (172 days = 1 season)
+- Arb (~$X) estimates come from Matt Swartz / MLB Trade Rumors' arbitration model, as shown on B-Ref.- Service time format: years.days (172 days = 1 season)
 - Dollars per WAR: $9.5M base case, tested at $8M (low) and $11M (high)
 
 ## Cleaning issues found
@@ -50,7 +49,7 @@
 - One season of WAR is noisy (Judge: 66 games in 2026), so split rate from availability.
 - Re-check 2026 row counts in the WAR files before any refresh.
 - The dollars-per-WAR estimate drives every surplus value number; show results under a range of values.
-- Open: a $2.49M gap between our 2026 total and B-Ref's. B-Ref footnotes its 2026 total with *; check what it covers.
+- - B-Ref says its 2026 total isn't an accurate payroll accounting (trades not prorated, new debuts not added, incentives not included), so a $2.49M gap in 2026 is accepted as a source limitation.
 
 ## Go / no-go
 Go.

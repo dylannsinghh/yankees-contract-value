@@ -1,0 +1,12 @@
+models:
+  - name: int_player_seasons
+    columns:
+      - name: player_season_key
+        data_tests:
+          - unique
+          - not_null
+      - name: primary_role
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['hitter', 'pitcher']

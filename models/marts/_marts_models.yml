@@ -1,0 +1,15 @@
+models:
+  - name: mart_2026_snapshot
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: net_cost_usd
+        data_tests:
+          - not_null
+      - name: role
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['hitter', 'starter', 'reliever']
