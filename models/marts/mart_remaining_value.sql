@@ -8,11 +8,12 @@ with seasons as (
 totals as (
     select
         player_id,
-        max(player_name)          as player_name,
-        count(*)                  as seasons_owed,
-        min(season)               as first_season,
-        max(season)               as last_season,
-        sum(cost_usd)             as remaining_cost_usd,
+        max(player_name)            as player_name,
+        count(*)                    as seasons_owed,
+        min(season)                 as first_season,
+        max(season)                 as last_season,
+        sum(cost_usd)               as remaining_cost_usd,
+        max(expected_availability)  as expected_availability,
         round(sum(expected_war), 2) as expected_war,
         round(sum(healthy_war), 2)  as healthy_war
     from seasons
@@ -26,6 +27,7 @@ select
     first_season,
     last_season,
     remaining_cost_usd,
+    expected_availability,
     expected_war,
     healthy_war,
     round(expected_war * {{ var('dollars_per_war_low') }}  - remaining_cost_usd) as surplus_expected_low_usd,

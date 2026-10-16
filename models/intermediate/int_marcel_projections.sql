@@ -62,7 +62,20 @@ weighted as (
         sum(case when l.role = 'hitter' then 6 - c.years_back else 4 - c.years_back end * c.war) as weighted_war,
         sum(case when l.role = 'hitter' then (6 - c.years_back) * c.pa else (4 - c.years_back) * c.ip end) as weighted_pt,
         sum(case when c.years_back = 1 then case when l.role = 'hitter' then c.pa else c.ip end else 0 end) as pt_last_season,
-        sum(case when c.years_back = 2 then case when l.role = 'hitter' then c.pa else c.ip end else 0 end) as pt_two_seasons_ago
+        sum(case when c.years_back = 2 then case when l.role = 'hitter' then c.pa else c.ip end else 0 end) as pt_two_seasons_ago,
+        -- Durability: share of a full season played in each of the last three seasons
+        -- (capped at 1), with the same weights. A missed season counts as 0.
+        sum(
+            case when l.role = 'hitter' then 6 - c.years_back else 4 - c.years_back end
+            * least(
+                case
+                    when l.role = 'hitter'      then c.pa / 600.0
+                    when l.start_share >= 0.5   then c.ip / 180.0
+                    else c.ip / 65.0
+                end,
+                1
+            )
+        ) / case when l.role = 'hitter' then 12.0 else 6.0 end as weighted_availability
     from contributions as c
     inner join latest as l
         on c.player_id = l.player_id
@@ -126,6 +139,7 @@ select
     round(weighted_pt / (weighted_pt + regression_pt), 3) as reliability,
     round(age_factor, 3)                            as age_factor,
     round(projected_pt, 1)                          as projected_pt,
+    round(weighted_availability, 3)                 as weighted_availability,
     round(projected_war_per_pt * full_season_pt, 2) as projected_war_per_full_season,
     round(projected_war_per_pt * projected_pt, 2)   as projected_war
 from projected
