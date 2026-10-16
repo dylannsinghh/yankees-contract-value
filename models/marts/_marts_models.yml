@@ -30,3 +30,14 @@ models:
       - name: cost_to_date_usd
         data_tests:
           - not_null
+
+  - name: mart_remaining_value
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: remaining_cost_usd
+        data_tests:
+          - not_null
+          

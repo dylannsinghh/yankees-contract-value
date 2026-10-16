@@ -9,6 +9,9 @@ vars:
   dollars_per_war_base: 9500000
   dollars_per_war_high: 11000000
   pre_arb_salary: 780000
+  marcel_regression_pa: 1200
+  marcel_regression_ip: 180
+  war_decline_per_year: 0.5
 
 models:
   yankees_contract_value:
