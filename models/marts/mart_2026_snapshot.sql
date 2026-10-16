@@ -53,7 +53,12 @@ nyy_pitching as (
 ),
 
 all_teams as (
-    select player_id, teams
+    -- His full 2026 season with every team, used to prorate split seasons.
+    select
+        player_id,
+        teams,
+        plate_appearances as total_plate_appearances,
+        innings_pitched   as total_innings_pitched
     from {{ ref('int_player_seasons') }}
     where season = 2026
 ),
@@ -61,8 +66,7 @@ all_teams as (
 joined as (
     select
         p.*,
-        coalesce(a.adjustment_usd, 0)                as cash_adjustment_usd,
-        p.salary_usd + coalesce(a.adjustment_usd, 0) as net_cost_usd,
+        coalesce(a.adjustment_usd, 0) as cash_adjustment_usd,
         b.plate_appearances,
         b.games_batting,
         pt.games_pitching,
@@ -70,7 +74,10 @@ joined as (
         pt.innings_pitched,
         b.war_batting,
         pt.war_pitching,
-        t.teams as teams_2026
+        t.teams as teams_2026,
+        t.total_plate_appearances,
+        t.total_innings_pitched,
+        b.player_id is not null or pt.player_id is not null as played_for_nyy
     from payroll as p
     left join cash_adjustments as a on p.player_name = a.player_name
     left join nyy_batting      as b  on p.player_id = b.player_id
@@ -86,7 +93,7 @@ with_role as (
             else coalesce(war_batting, 0) + coalesce(war_pitching, 0)
         end as war_nyy,
         case
-            when coalesce(games_pitching, 0) = 0 and coalesce(games_batting, 0) = 0 then null
+            when not played_for_nyy then null
             when coalesce(games_pitching, 0) >= coalesce(games_batting, 0) then
                 case when games_started >= games_pitching / 2.0 then 'starter' else 'reliever' end
             else 'hitter'
@@ -101,8 +108,37 @@ with_playing_time as (
             when 'hitter'   then plate_appearances / 600.0
             when 'starter'  then innings_pitched / 180.0
             when 'reliever' then innings_pitched / 65.0
-        end as share_of_full_season
+        end as share_of_full_season,
+        case
+            when not played_for_nyy and teams_2026 is not null then 0
+            when not played_for_nyy then null
+            when teams_2026 = 'NYY' then 1
+            when role = 'hitter' then plate_appearances / nullif(total_plate_appearances, 0)
+            else innings_pitched / nullif(total_innings_pitched, 0)
+        end as nyy_share_of_2026
     from with_role
+),
+
+with_cost as (
+    select
+        *,
+        case
+            when nyy_share_of_2026 is not null
+                then salary_usd * nyy_share_of_2026 + cash_adjustment_usd
+            when salary_type = 'guaranteed'
+                then salary_usd + cash_adjustment_usd
+        end as cost_2026_usd,
+        case
+            when not played_for_nyy and teams_2026 is not null
+                then 'Joined after his 2026 games'
+            when not played_for_nyy and salary_type = 'pre_arb'
+                then 'No 2026 MLB games (pre-arb, likely in the minors)'
+            when not played_for_nyy and salary_type = 'arb_estimate'
+                then 'No 2026 MLB games (salary is an estimate)'
+            when not played_for_nyy
+                then 'No 2026 MLB games (paid to sit)'
+        end as excluded_reason
+    from with_playing_time
 )
 
 select
@@ -113,19 +149,22 @@ select
     role,
     teams_2026,
     coalesce(teams_2026 <> 'NYY', false)                  as split_season,
+    played_for_nyy,
+    excluded_reason,
     salary_type,
     is_estimated,
     salary_usd,
     cash_adjustment_usd,
-    net_cost_usd,
+    round(nyy_share_of_2026, 3)                           as nyy_share_of_2026,
+    round(cost_2026_usd)                                  as cost_2026_usd,
     plate_appearances,
     round(innings_pitched, 1)                             as innings_pitched,
     war_nyy,
     round(share_of_full_season, 3)                        as share_of_full_season,
     round(war_nyy / nullif(share_of_full_season, 0), 2)   as war_per_full_season,
     coalesce(share_of_full_season, 0) < 0.2               as is_small_sample,
-    case when war_nyy > 0 then round(net_cost_usd / war_nyy) end as cost_per_war_usd,
-    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_low') }}  - net_cost_usd) as surplus_low_usd,
-    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_base') }} - net_cost_usd) as surplus_base_usd,
-    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_high') }} - net_cost_usd) as surplus_high_usd
-from with_playing_time
+    case when war_nyy > 0 then round(cost_2026_usd / war_nyy) end as cost_per_war_usd,
+    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_low') }}  - cost_2026_usd) as surplus_low_usd,
+    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_base') }} - cost_2026_usd) as surplus_base_usd,
+    round(coalesce(war_nyy, 0) * {{ var('dollars_per_war_high') }} - cost_2026_usd) as surplus_high_usd
+from with_cost
