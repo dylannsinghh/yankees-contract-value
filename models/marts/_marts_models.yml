@@ -47,3 +47,23 @@ models:
         data_tests:
           - unique
           - not_null
+
+  - name: mart_2027_outlook
+    columns:
+      - name: sort_order
+        data_tests:
+          - unique
+          - not_null
+      - name: value
+        data_tests:
+          - not_null
+
+  - name: mart_pending_free_agents
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: profile
+        data_tests:
+          - not_null
