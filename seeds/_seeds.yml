@@ -1,0 +1,7 @@
+seeds:
+  - name: roster_additions
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null

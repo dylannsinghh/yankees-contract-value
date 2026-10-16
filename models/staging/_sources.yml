@@ -13,3 +13,7 @@ sources:
         config:
           meta:
             external_location: "read_csv('data/raw/nyy_contracts_2026.csv', all_varchar = true)"
+      - name: nyy_appearances
+        config:
+          meta:
+            external_location: "read_csv('data/raw/nyy_appearances_2026.csv', header = true)"
