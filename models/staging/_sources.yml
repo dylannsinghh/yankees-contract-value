@@ -1,0 +1,15 @@
+sources:
+  - name: bref
+    tables:
+      - name: war_batting
+        config:
+          meta:
+            external_location: "read_csv('data/raw/war_daily_bat.txt', nullstr = 'NULL')"
+      - name: war_pitching
+        config:
+          meta:
+            external_location: "read_csv('data/raw/war_daily_pitch.txt', nullstr = 'NULL')"
+      - name: nyy_contracts
+        config:
+          meta:
+            external_location: "read_csv('data/raw/nyy_contracts_2026.csv', all_varchar = true)"
