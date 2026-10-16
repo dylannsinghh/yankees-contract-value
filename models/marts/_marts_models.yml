@@ -20,3 +20,13 @@ models:
           - not_null:
               config:
                 where: "not played_for_nyy"
+
+  - name: mart_contract_retrospective
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: cost_to_date_usd
+        data_tests:
+          - not_null

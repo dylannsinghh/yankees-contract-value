@@ -10,3 +10,13 @@ models:
           - accepted_values:
               arguments:
                 values: ['hitter', 'pitcher']
+
+  - name: int_contract_seasons
+    columns:
+      - name: contract_season_key
+        data_tests:
+          - unique
+          - not_null
+      - name: nyy_share
+        data_tests:
+          - not_null
