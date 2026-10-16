@@ -37,6 +37,21 @@ models:
       - name: player_name
         data_tests:
           - not_null
+      - name: contract_years
+        data_tests:
+          - not_null:
+              config:
+                where: "contract_status_raw is not null"
+      - name: contract_total_usd
+        data_tests:
+          - not_null:
+              config:
+                where: "contract_status_raw is not null"
+      - name: contract_start_season
+        data_tests:
+          - not_null:
+              config:
+                where: "contract_status_raw is not null"
 
   - name: stg_nyy_salaries
     columns:

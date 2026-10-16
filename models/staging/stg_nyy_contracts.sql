@@ -24,9 +24,36 @@ cleaned as (
         "Acquired"         as acquired,
         "Agent"            as agent
     from players
+),
+
+parsed as (
+    -- Contract Status looks like "9 yrs/$360M (23-31)" or "1 yr/$22.03M (26)",
+    -- sometimes with option text after it ("& 28 team option").
+    select
+        *,
+        try_cast(regexp_extract(contract_status_raw, '^([0-9]+) yrs?/', 1) as integer) as contract_years,
+        {{ parse_millions('contract_status_raw') }}                                   as contract_total_usd,
+        try_cast(regexp_extract(contract_status_raw, '\(([0-9]+)', 1) as integer)          as start_yy,
+        try_cast(nullif(regexp_extract(contract_status_raw, '\([0-9]+-([0-9]+)\)', 1), '') as integer) as end_yy
+    from cleaned
 )
 
 select
-    *,
-    round(service_years + service_days / 172.0, 3) as service_time_seasons
-from cleaned
+    player_id,
+    player_name,
+    age,
+    service_time_raw,
+    service_years,
+    service_days,
+    round(service_years + service_days / 172.0, 3) as service_time_seasons,
+    mlb_seasons_raw,
+    contract_status_raw,
+    contract_years,
+    contract_total_usd,
+    2000 + start_yy                   as contract_start_season,
+    2000 + coalesce(end_yy, start_yy) as contract_end_season,
+    round(contract_total_usd / nullif(contract_years, 0)) as contract_aav_usd,
+    coalesce(contract_status_raw like '%option%', false) as has_option,
+    acquired,
+    agent
+from parsed

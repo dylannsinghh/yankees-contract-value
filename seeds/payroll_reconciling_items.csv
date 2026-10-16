@@ -1,5 +1,5 @@
 season,difference_millions,status,reason
 2026,10.00,explained,"Marlins cash on the Stanton trade row: B-Ref's total is lower by the same $10M in each season the cash is paid (2026-2028), so it appears to subtract it twice. We count it once."
 2027,10.00,explained,"Marlins cash on the Stanton trade row (see 2026)."
-2028,10.00,explained,"Marlins cash on the Stanton trade row (see 2026)."
-2026,2.49,open,"Not yet explained. B-Ref footnotes its 2026 total with *; check what it covers."
+2028,10.00,explained,"Marlins cash on the Stanton trade row (see 2026). B-Ref's total includes buyouts, so the $10M Stanton buyout is not the cause."
+2026,2.49,accepted,"B-Ref notes its 2026 total is not an accurate payroll accounting: trades are not prorated, new debuts are not added, incentives are not included. Accepted as a known limitation of the source."

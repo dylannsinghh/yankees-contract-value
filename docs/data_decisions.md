@@ -30,8 +30,21 @@
 
 ## Assumptions
 - Pre-arb players with no listed salary: $780,000 (2026 league minimum)
+- Arb (~$X) estimates come from Matt Swartz / MLB Trade Rumors' arbitration model, as shown on B-Ref.
 - Service time format: years.days (172 days = 1 season)
 - Dollars per WAR: $9.5M base case, tested at $8M (low) and $11M (high)
+
+## Methodology
+- **2026 snapshot uses 2026 cash salary.** The contract retrospective uses average annual value (AAV = total / years), the same basis as MLB's luxury tax, because salaries before 2026 aren't in the data. AAV also keeps back-loaded deals (like Fried's) from looking artificially cheap or expensive in a single year.
+- **Only WAR earned as a Yankee counts.** A player acquired mid-season gets credit only for his time in New York.
+- **Split-season costs are prorated** by the share of that season's playing time spent with the Yankees (PA for hitters, innings for pitchers). B-Ref doesn't prorate trades, so this corrects it.
+- **Rate vs availability:** availability = share of a full season played (600 PA for hitters, 180 IP for starters, 65 IP for relievers). Rate = WAR per full season. Rate x availability = WAR.
+- **Small samples** (under 20% of a full season) are kept in totals but not ranked on rate.
+- **Excluded from the 2026 rankings:** players with no 2026 games for the Yankees (likely in the minors, joined after their 2026 games, or salary only estimated). Each has a labeled reason.
+- **Contract years counted:** free agents from the first year of the contract; trade acquisitions from their first season as a Yankee. Seasons missed entirely to injury count as a full year of cost with 0 WAR.
+- **2020** costs are scaled to 60/162 to match the shortened season's prorated pay.
+- **Trade cash** tied to a player on the roster (e.g., the Marlins' payments on Stanton) reduces that player's cost.
+- **WAR is regular season only** and includes the standard positional penalty for designated hitters.
 
 ## Cleaning issues found
 - 62 rows: 42 players + 20 non-player rows (blank spacers, payroll summaries, dead money notes), all with Name-additional = -9999. Filter on that sentinel.
@@ -42,15 +55,4 @@
 - Service time is years.days, not a decimal.
 - Yrs is seasons in MLB ("1st" = rookie), not contract length.
 - Column names need quotes: "Name-additional", "Contract Status", "2026".
-- Dead money rows (buyouts, releases, trades with cash): keep as a separate table so player costs reflect net cost to the Yankees. Negative amounts are cash coming back to the Yankees.
-- Dead money descriptions repeat across six columns (one merged cell on the page); read it from Age.
-- B-Ref's Dollars Committed appears to subtract the Stanton trade cash twice ($10M a year, 2026-2028). We count it once.
-
-## Risks and open questions
-- One season of WAR is noisy (Judge: 66 games in 2026), so split rate from availability.
-- Re-check 2026 row counts in the WAR files before any refresh.
-- The dollars-per-WAR estimate drives every surplus value number; show results under a range of values.
-- Open: a $2.49M gap between our 2026 total and B-Ref's. B-Ref footnotes its 2026 total with *; check what it covers.
-
-## Go / no-go
-Go.
+- Dead money rows (buyouts, releases, trades with cash): keep as a separate table so player costs reflect
