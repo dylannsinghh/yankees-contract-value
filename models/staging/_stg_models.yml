@@ -61,3 +61,19 @@ models:
           - not_null:
               config:
                 where: "salary_type in ('guaranteed', 'arb_estimate', 'pre_arb')"
+
+  - name: stg_nyy_dead_money
+    columns:
+      - name: dead_money_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_name
+        data_tests:
+          - not_null
+      - name: adjustment_type
+        data_tests:
+          - not_null
+      - name: amount_usd
+        data_tests:
+          - not_null

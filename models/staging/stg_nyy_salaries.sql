@@ -42,7 +42,7 @@ typed as (
             when raw_value is null and filled_cells_so_far = 0 then 'pre_arb'
             when raw_value is null and filled_cells_so_far > 0 then 'not_under_control'
         end as salary_type,
-        try_cast(regexp_extract(raw_value, '\$([0-9.]+)M', 1) as double) as salary_millions,
+        {{ parse_millions('raw_value') }} as parsed_usd,
         nullif(regexp_extract(raw_value, '\[(.*)\]', 1), '') as cell_note
     from with_position
 )
@@ -55,7 +55,7 @@ select
     salary_type,
     case
         when salary_type = 'pre_arb' then {{ var('pre_arb_salary') }}
-        else cast(round(salary_millions * 1000000) as bigint)
+        else parsed_usd
     end as salary_usd,
     salary_type in ('pre_arb', 'arb_estimate') as is_estimated,
     cell_note
