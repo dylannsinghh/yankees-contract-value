@@ -12,3 +12,9 @@ seeds:
         data_tests:
           - unique
           - not_null
+
+  - name: free_agents_2027
+    config:
+      column_types:
+        option_note: varchar
+        bref_name: varchar

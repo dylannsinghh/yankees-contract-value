@@ -1,0 +1,12 @@
+models:
+  - name: stg_free_agents
+    columns:
+      - name: free_agent_key
+        data_tests:
+          - unique
+          - not_null
+      - name: position
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['2B', '3B', 'SS', 'CF', 'SP', 'RP']
