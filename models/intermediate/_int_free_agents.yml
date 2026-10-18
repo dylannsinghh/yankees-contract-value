@@ -1,0 +1,12 @@
+models:
+  - name: int_free_agent_matches
+    columns:
+      - name: free_agent_key
+        data_tests:
+          - unique
+          - not_null
+      - name: player_id
+        data_tests:
+          - unique:
+              config:
+                where: "player_id is not null"
