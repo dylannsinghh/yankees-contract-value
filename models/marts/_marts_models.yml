@@ -40,4 +40,62 @@ models:
       - name: remaining_cost_usd
         data_tests:
           - not_null
-          
+
+  - name: mart_roster_value
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: mart_2027_outlook
+    columns:
+      - name: sort_order
+        data_tests:
+          - unique
+          - not_null
+      - name: value
+        data_tests:
+          - not_null
+
+  - name: mart_pending_free_agents
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: profile
+        data_tests:
+          - not_null
+
+  - name: mart_2027_position_depth
+    columns:
+      - name: position
+        data_tests:
+          - unique
+          - not_null
+      - name: status
+        data_tests:
+          - not_null
+
+  - name: mart_resign_candidates
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+      - name: resign_case
+        data_tests:
+          - not_null
+
+  - name: mart_player_summary
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: verdict
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Core piece', 'Good value', 'Fair price', 'Overpaid unless healthy', 'Overpaid', 'Big overpay', 'Too early to tell', 'Re-sign', 'Re-sign at the right price', 'Let walk']

@@ -9,9 +9,16 @@ vars:
   dollars_per_war_base: 9500000
   dollars_per_war_high: 11000000
   pre_arb_salary: 780000
-  marcel_regression_pa: 1200
-  marcel_regression_ip: 180
+  marcel_regression_pa: 3600
+  marcel_regression_ip: 720
+  marcel_pitcher_pt_factor: 0.8
   war_decline_per_year: 0.5
+  arb_share_of_value: 0.6
+  replacement_level_wins: 48
+  team_plate_appearances: 6200
+  team_innings: 1450
+  team_starter_innings: 860
+  team_bullpen_innings: 590
 
 models:
   yankees_contract_value:

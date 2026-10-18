@@ -1,7 +1,11 @@
 -- Marcel-style WAR projection: one row per player per target season (2022-2027).
--- Based on Tom Tango's Marcel method, applied to WAR. It's a fixed formula with no
--- model fitting: weight the last three seasons (most recent counts most), pull the
--- result toward league average, adjust for age, then multiply by projected playing time.
+-- Based on Tom Tango's Marcel method, applied to WAR. It's a fixed formula: weight the
+-- last three seasons (most recent counts most), pull the result toward league average,
+-- adjust for age, then multiply by projected playing time.
+-- Calibrated against 2023-2026 backtests (analyses/marcel_calibration_summary.sql):
+-- WAR is noisier than the batting stats Marcel was built for, so it gets more regression
+-- (3,600 PA / 720 IP instead of 1,200 / 180), and pitchers threw about 80% of the
+-- innings the original formula expected, so pitcher playing time is scaled by 0.8.
 
 {% set first_target = 2022 %}
 {% set last_target = 2027 %}
@@ -108,7 +112,8 @@ inputs as (
         end as age_factor,
         case
             when w.role = 'hitter' then 0.5 * w.pt_last_season + 0.1 * w.pt_two_seasons_ago + 200
-            else 0.5 * w.pt_last_season + 0.1 * w.pt_two_seasons_ago + 25 + 35 * w.start_share
+            else (0.5 * w.pt_last_season + 0.1 * w.pt_two_seasons_ago + 25 + 35 * w.start_share)
+                 * {{ var('marcel_pitcher_pt_factor') }}
         end as projected_pt,
         case
             when w.role = 'hitter' then 600
@@ -140,6 +145,7 @@ select
     round(age_factor, 3)                            as age_factor,
     round(projected_pt, 1)                          as projected_pt,
     round(weighted_availability, 3)                 as weighted_availability,
+    round(least(projected_pt / full_season_pt, 1), 3) as marcel_availability,
     round(projected_war_per_pt * full_season_pt, 2) as projected_war_per_full_season,
     round(projected_war_per_pt * projected_pt, 2)   as projected_war
 from projected
