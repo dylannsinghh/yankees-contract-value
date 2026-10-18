@@ -92,3 +92,15 @@ models:
       - name: amount_usd
         data_tests:
           - not_null
+
+  - name: stg_nyy_appearances
+    columns:
+      - name: player_position_key
+        data_tests:
+          - unique
+          - not_null
+      - name: position
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['P', 'C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH']

@@ -67,3 +67,22 @@ models:
       - name: profile
         data_tests:
           - not_null
+
+  - name: mart_2027_position_depth
+    columns:
+      - name: position
+        data_tests:
+          - unique
+          - not_null
+      - name: status
+        data_tests:
+          - not_null
+
+  - name: mart_resign_candidates
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+      - name: resign_case
+        data_tests:
+          - not_null
