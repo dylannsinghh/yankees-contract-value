@@ -1,5 +1,7 @@
 -- One row per player per season the Yankees control him after 2026 (through 2032):
 -- guaranteed contract years, arbitration years, and pre-arbitration years.
+-- Players B-Ref still lists but who are no longer on the 40-man roster (outrighted,
+-- or on minor league deals) are removed using seeds/roster_removals.csv.
 -- Same projection logic as the contract model, extended to the whole roster:
 --   rate:      2027 Marcel projection per full season, minus 0.5 WAR a year once he's past 30
 --   expected:  established players (3+ years of service) use their durability over the last
@@ -20,6 +22,7 @@ with control as (
     from {{ ref('stg_nyy_salaries') }}
     where season > 2026
       and salary_type in ('guaranteed', 'arb_estimate', 'arb_unknown', 'pre_arb')
+      and player_id not in (select player_id from {{ ref('roster_removals') }})
 ),
 
 players as (
