@@ -1,5 +1,7 @@
 -- The free-agent board: every 2026-27 free agent at a position the Yankees need, with his
 -- projected 2027 WAR, a fair one-year price, and whether he fills a Yankees hole.
+-- Two prices: "fair price" uses his expected playing time (injury risk included), and
+-- "price if healthy" assumes a full season. Aces and injured players sit far apart.
 -- Same projection and same 9.5 million per WAR as the rest of the project, so these numbers
 -- compare directly with the Yankees' own players and their pending free agents.
 
@@ -39,6 +41,7 @@ select
     p.projected_war_per_full_season                        as war_per_full_season,
     p.reliability,
     round(p.projected_war * {{ var('dollars_per_war_base') }} / 1e6, 1) as fair_price_m,
+    round(p.projected_war_per_full_season * {{ var('dollars_per_war_base') }} / 1e6, 1) as fair_price_if_healthy_m,
     case
         when p.player_id is null      then 'No recent MLB track record'
         when p.projected_war >= 3     then 'Impact (3+ WAR)'

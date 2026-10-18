@@ -13,6 +13,7 @@ select
     projected_war_2027,
     war_per_full_season,
     fair_price_m,
+    fair_price_if_healthy_m,
     is_buy_low,
     is_yankees_free_agent,
     availability
