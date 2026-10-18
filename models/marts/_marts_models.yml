@@ -86,3 +86,16 @@ models:
       - name: resign_case
         data_tests:
           - not_null
+
+  - name: mart_player_summary
+    columns:
+      - name: player_id
+        data_tests:
+          - unique
+          - not_null
+      - name: verdict
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Core piece', 'Good value', 'Fair price', 'Overpaid unless healthy', 'Overpaid', 'Big overpay', 'Too early to tell', 'Re-sign', 'Re-sign at the right price', 'Let walk']
