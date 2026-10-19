@@ -19,6 +19,9 @@ vars:
   team_innings: 1450
   team_starter_innings: 860
   team_bullpen_innings: 590
+  average_war_per_600_pa: 2.0
+  average_war_per_180_sp_ip: 2.0
+  average_war_per_65_rp_ip: 0.5
 
 models:
   yankees_contract_value:
