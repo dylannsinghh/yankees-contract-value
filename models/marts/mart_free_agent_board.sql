@@ -2,6 +2,8 @@
 -- projected 2027 WAR, a fair one-year price, and whether he fills a Yankees hole.
 -- Two prices: "fair price" uses his expected playing time (injury risk included), and
 -- "price if healthy" assumes a full season. Aces and injured players sit far apart.
+-- rank_among_available ranks only players with no option or opt-out (the ones who will
+-- actually reach the market), so the board can show the best 5 who can be signed.
 -- Same projection and same 9.5 million per WAR as the rest of the project, so these numbers
 -- compare directly with the Yankees' own players and their pending free agents.
 
@@ -64,7 +66,13 @@ select
     row_number() over (
         partition by m.position
         order by p.projected_war desc nulls last, m.player_name
-    )                                                      as rank_at_position
+    )                                                      as rank_at_position,
+    case
+        when m.option_note is null then row_number() over (
+            partition by m.position, m.option_note is null
+            order by p.projected_war desc nulls last, m.player_name
+        )
+    end                                                    as rank_among_available
 from matched as m
 left join projection as p on m.player_id = p.player_id
 left join depth as d on m.position = d.position
