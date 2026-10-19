@@ -1,9 +1,13 @@
 -- 2027 depth by position: how much of each position's playing time the players the
--- Yankees control can cover, and how good they're projected to be there.
+-- Yankees control can cover, how good they're projected to be there, and how far short
+-- that is of an average starter at the position.
 -- Hitters: each player's projected 2027 playing time and WAR is split across positions
 -- in the same proportions he played them for the Yankees in 2026.
 -- Pitchers: starters vs relievers, based on how often each one started in 2026.
 -- Players with no 2026 Yankees appearances are listed as "Unassigned".
+-- main_players lists hitters with 50+ projected PA and pitchers with 15+ projected innings.
+-- Average-starter benchmark: 2 WAR per 600 PA for hitters, 2 WAR per 180 innings for
+-- starting pitchers, 0.5 WAR per 65 innings for relievers (dbt vars).
 
 with controlled as (
     select
@@ -65,22 +69,26 @@ all_slots as (
 ),
 
 needed as (
-    -- Playing time a team uses at each spot in a season.
+    -- Playing time a team uses at each spot in a season, and the WAR an average
+    -- starter would produce with that much playing time.
     select
         position,
         sort_order,
         'PA' as unit,
-        {{ var('team_plate_appearances') }} / 9.0 as needed_pt
+        {{ var('team_plate_appearances') }} / 9.0 as needed_pt,
+        {{ var('team_plate_appearances') }} / 9.0 / 600 * {{ var('average_war_per_600_pa') }} as average_war
     from (values
         ('C', 1), ('1B', 2), ('2B', 3), ('3B', 4), ('SS', 5),
         ('LF', 6), ('CF', 7), ('RF', 8), ('DH', 9)
     ) as v(position, sort_order)
     union all
-    select 'SP', 10, 'IP', {{ var('team_starter_innings') }}
+    select 'SP', 10, 'IP', {{ var('team_starter_innings') }},
+        {{ var('team_starter_innings') }} / 180.0 * {{ var('average_war_per_180_sp_ip') }}
     union all
-    select 'RP', 11, 'IP', {{ var('team_bullpen_innings') }}
+    select 'RP', 11, 'IP', {{ var('team_bullpen_innings') }},
+        {{ var('team_bullpen_innings') }} / 65.0 * {{ var('average_war_per_65_rp_ip') }}
     union all
-    select 'Unassigned', 12, 'PA', null
+    select 'Unassigned', 12, 'PA', null, null
 ),
 
 by_position as (
@@ -89,7 +97,10 @@ by_position as (
         sum(pt)  as projected_pt,
         sum(war) as projected_war,
         string_agg(
-            case when pt >= 50 then player_name || ' (' || cast(round(war, 1) as varchar) || ')' end,
+            case
+                when pt >= case when position in ('SP', 'RP') then 15 else 50 end
+                    then player_name || ' (' || cast(round(war, 1) as varchar) || ')'
+            end,
             ', ' order by war desc
         ) as main_players
     from all_slots
@@ -104,6 +115,10 @@ select
     round(coalesce(b.projected_pt, 0) / n.needed_pt, 2)        as coverage,
     round(coalesce(b.projected_war, 0), 1)                     as projected_war,
     round(b.projected_war / nullif(b.projected_pt, 0) * n.needed_pt, 1) as war_if_full_time,
+    round(n.average_war, 1)                                    as average_starter_war,
+    round(greatest(n.average_war - coalesce(b.projected_war, 0), 0), 1) as war_short,
+    round(greatest(n.average_war - coalesce(b.projected_war, 0), 0)
+          * {{ var('dollars_per_war_base') }} / 1e6, 1)        as cost_to_close_m,
     case
         when n.needed_pt is null                                   then 'Not assigned to a position'
         when coalesce(b.projected_pt, 0) / n.needed_pt < 0.5        then 'Gap: not enough players'
